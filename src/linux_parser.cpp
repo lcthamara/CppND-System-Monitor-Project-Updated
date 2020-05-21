@@ -70,10 +70,11 @@ vector<int> LinuxParser::Pids() {
 float LinuxParser::MemoryUtilization() { string line;
   string key;
   string value;
-  string memtot, memfree;
-  std::ifstream filestream(kProcDirectory + kMeminfoFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
+  string memtot;
+  string memfree;
+  std::ifstream memorystream(kProcDirectory + kMeminfoFilename);
+  if (memorystream.is_open()) {
+    while (std::getline(memorystream, line)) {
       
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
@@ -87,83 +88,98 @@ float LinuxParser::MemoryUtilization() { string line;
       
     }
   }
-
+  memorystream.close();
   return (stof(memtot) - stof(memfree)) / stof(memtot);
 }
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { 
   string line;
-  string value1, value2;
-  std::ifstream filestream(kProcDirectory + kUptimeFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
+  string value1;
+  string value2;
+  std::ifstream uptimestream(kProcDirectory + kUptimeFilename);
+  if (uptimestream.is_open()) {
+    std::getline(uptimestream, line);
     std::istringstream linestream(line);
     while (linestream >> value1 >> value2) {
+      uptimestream.close();
       return std::stol(value1); 
     }
   }
+  uptimestream.close(); 
   return 0;
 }
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { 
-  string line, cputotal;
+  string line;
+  string cputotal;
   string v1, v2, v3, v4;
-  std::ifstream filestream(kProcDirectory + kStatFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
+  std::ifstream jiffiesstream(kProcDirectory + kStatFilename);
+  if (jiffiesstream.is_open()) {
+    std::getline(jiffiesstream, line);
     std::istringstream linestream(line);
     while (linestream >> cputotal >> v1 >> v2 >> v3 >> v4) {
+      jiffiesstream.close();
       return std::stol(v1) + std::stol(v2) + std::stol(v3) + std::stol(v4); 
     }
   }
+  jiffiesstream.close();
   return 0;
 }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid) { 
-  string line, cputotal;
+  string line;
+  string  cputotal;
   string v1, v2, v3, v4;
-  std::ifstream filestream(kProcDirectory + std::to_string(pid) + kStatFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
+  std::ifstream activejiffiesstream(kProcDirectory + std::to_string(pid) + kStatFilename);
+  if (activejiffiesstream.is_open()) {
+    std::getline(activejiffiesstream, line);
     std::istringstream linestream(line);
     while (linestream >> cputotal >> v1 >> v2 >> v3 >> v4) {
+      activejiffiesstream.close();
       return std::stol(v1) + std::stol(v2) + std::stol(v3); 
     }
   }
+  activejiffiesstream.close();
   return 0;
 }
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() {
-  string line, cputotal;
+  string line;
+  string cputotal;
   string v1, v2, v3, v4;
-  std::ifstream filestream(kProcDirectory + kStatFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
+  std::ifstream activeJiffiesStream(kProcDirectory + kStatFilename);
+  if (activeJiffiesStream.is_open()) {
+    std::getline(activeJiffiesStream, line);
     std::istringstream linestream(line);
     while (linestream >> cputotal >> v1 >> v2 >> v3 >> v4) {
+      activeJiffiesStream.close();
       return std::stol(v1) + std::stol(v2) + std::stol(v3); 
     }
   }
+  activeJiffiesStream.close();
   return 0;
 }
 
 // TODO: Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies() {
-  string line, cputotal;
+  string line;
+  string cputotal;
   string v1, v2, v3, v4;
-  std::ifstream filestream(kProcDirectory + kStatFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
+  std::ifstream idlejiffiesstream(kProcDirectory + kStatFilename);
+  if (idlejiffiesstream.is_open()) {
+    std::getline(idlejiffiesstream, line);
     std::istringstream linestream(line);
     while (linestream >> cputotal >> v1 >> v2 >> v3 >> v4) {
+      idlejiffiesstream.close();
       return std::stol(v4); 
     }
   }
+  idlejiffiesstream.close();
   return 0;
 }
 
@@ -175,17 +191,19 @@ int LinuxParser::TotalProcesses() {
   string line;
   string key;
   string value;
-  std::ifstream filestream(kProcDirectory + kStatFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
+  std::ifstream totalProcStream(kProcDirectory + kStatFilename);
+  if (totalProcStream.is_open()) {
+    while (std::getline(totalProcStream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
         if (key == "processes") {
+          totalProcStream.close();
           return stoi(value);
         }
       }
     }
   }
+  totalProcStream.close();
   return 0;
 }
 
@@ -194,17 +212,19 @@ int LinuxParser::RunningProcesses() {
   string line;
   string key;
   string value;
-  std::ifstream filestream(kProcDirectory + kStatFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
+  std::ifstream runningstream(kProcDirectory + kStatFilename);
+  if (runningstream.is_open()) {
+    while (std::getline(runningstream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
         if (key == "procs_running") {
+          runningstream.close();
           return stoi(value);
         }
       }
     }
   }
+  runningstream.close();
   return 0;
 }
 
@@ -212,12 +232,14 @@ int LinuxParser::RunningProcesses() {
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Command(int pid) {
   string line;
-  std::ifstream filestream(kProcDirectory + std::to_string(pid) + kCmdlineFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
+  std::ifstream commandstream(kProcDirectory + std::to_string(pid) + kCmdlineFilename);
+  if (commandstream.is_open()) {
+    std::getline(commandstream, line);
     std::istringstream linestream(line);
+    commandstream.close();
     return line;    
   }
+  commandstream.close();
   return string();
 }
 
@@ -225,18 +247,25 @@ string LinuxParser::Command(int pid) {
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Ram(int pid) {
   string line;
-  string key, value;
-  std::ifstream filestream(kProcDirectory + std::to_string(pid) + kStatusFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
+  string key;
+  string value;
+  int ram;
+  std::ifstream ramstream(kProcDirectory + std::to_string(pid) + kStatusFilename);
+  if (ramstream.is_open()) {
+    while (std::getline(ramstream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
         if (key == "VmSize:") {
+          ramstream.close();
+          ram = std::stof(value);
+          ram = int(ram / 1024); //convert kB to MB
+          value = to_string(ram);
           return value;
         }
       }
     }
   }
+  ramstream.close();
   return string();
 }
 
@@ -246,17 +275,19 @@ string LinuxParser::Uid(int pid) {
   string line;
   string key;
   string value;
-  std::ifstream filestream(kProcDirectory + std::to_string(pid) + kStatusFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
+  std::ifstream uidstream(kProcDirectory + std::to_string(pid) + kStatusFilename);
+  if (uidstream.is_open()) {
+    while (std::getline(uidstream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
         if (key == "Uid:") {
+          uidstream.close();
           return value;
         }
       }
     }
   }
+  uidstream.close();
   return string();
 }
 
@@ -267,18 +298,20 @@ string LinuxParser::User(int pid) {
   string key1, key2, key3;
   string uid;
   uid = LinuxParser::Uid(pid);
-  std::ifstream filestream(kPasswordPath);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
+  std::ifstream userstream(kPasswordPath);
+  if (userstream.is_open()) {
+    while (std::getline(userstream, line)) {
       std::replace(line.begin(), line.end(), ':', ' ');
       std::istringstream linestream(line);
       while (linestream >> key1 >> key2 >> key3) {
         if (key3 == uid) {
+          userstream.close();
           return key1;
         }
       }
     }
   }
+  userstream.close();
   return string();
 }
 
@@ -287,27 +320,29 @@ string LinuxParser::User(int pid) {
 long LinuxParser::UpTime(int pid) {
   string line;
   string uptime;
-  std::ifstream filestream(kProcDirectory + std::to_string(pid) + kStatFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
+  std::ifstream upTIMEstream(kProcDirectory + std::to_string(pid) + kStatFilename);
+  if (upTIMEstream.is_open()) {
+    while (std::getline(upTIMEstream, line)) {
       std::istringstream linestream(line);
       for (int i = 0; i< 22; i++) {
         linestream >> uptime;
-      } 
+      }
+      upTIMEstream.close() ;
       return stol(uptime) / sysconf(_SC_CLK_TCK);     
     }
   }
+  upTIMEstream.close();
   return 0;
 }
 
-std::vector<float> LinuxParser::fiveVariables(int pid) {
+std::vector<float> LinuxParser::threeVariables(int pid) {
   string line;
   string var;
-  float utime, stime, cutime, cstime, starttime;
-  std::vector<float> fiveVar;
-  std::ifstream filestream(kProcDirectory + std::to_string(pid) + kStatFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
+  float utime, stime, starttime;
+  std::vector<float> threeVar;
+  std::ifstream threeVARstream(kProcDirectory + std::to_string(pid) + kStatFilename);
+  if (threeVARstream.is_open()) {
+    std::getline(threeVARstream, line);
     std::istringstream linestream(line);
     for (int i = 0; i< 22; i++) {
       linestream >> var;
@@ -317,17 +352,12 @@ std::vector<float> LinuxParser::fiveVariables(int pid) {
       if (i==14){
         stime = stol(var);
       }
-      if (i==15){
-        cutime = stol(var);
-      }
-      if (i==16) {
-        cstime = stol(var);
-      }
       if (i==21) {
         starttime = stol(var);
       }
     } 
   }
-  fiveVar = {utime, stime, cutime, cstime, starttime};
-  return fiveVar;
+  threeVar = {utime, stime, starttime};
+  threeVARstream.close();
+  return threeVar;
 }

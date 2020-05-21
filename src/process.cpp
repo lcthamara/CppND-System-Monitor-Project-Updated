@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-#include <iostream>
-
 #include "process.h"
 #include "linux_parser.h"
 
@@ -24,17 +22,13 @@ int Process::Pid() { return pid; }
 
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() { 
-    std::vector<float> mySixVar = LinuxParser::fiveVariables(pid);
-    
-    float utime = mySixVar[0];
-    float stime = mySixVar[1];
-    float cutime = mySixVar[2];
-    float cstime = mySixVar[3];
-    float starttime = mySixVar[4];
+    std::vector<float> myThreeVar = LinuxParser::threeVariables(pid);
+    float utime = myThreeVar[0];
+    float stime = myThreeVar[1];
+    float starttime = myThreeVar[4];
 
     float uptime = LinuxParser::UpTime();
 
-    //std::cout << sysconf(_SC_CLK_TCK) << "\n";
     float total_time = utime + stime;
     //total_time = total_time + cutime + cstime;
     float seconds = uptime - (starttime / sysconf(_SC_CLK_TCK));

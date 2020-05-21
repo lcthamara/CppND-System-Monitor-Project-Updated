@@ -52,7 +52,7 @@ std::string Ram(int pid);
 std::string Uid(int pid);
 std::string User(int pid);
 long int UpTime(int pid);
-std::vector<float> fiveVariables(int pid);
+std::vector<float> threeVariables(int pid);
 };  // namespace LinuxParser
 
 #endif
